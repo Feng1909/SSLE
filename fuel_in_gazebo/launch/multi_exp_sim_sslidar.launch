@@ -36,7 +36,7 @@
 		<include file="$(find sim_kit)/launch/include/single_basic.launch">
 			<arg name="uav_name" value="$(arg uav1_name)"/>
 			<arg name="ID" value="0"/>
-			<arg name="model" value="p450_sslidar"/>
+			<arg name="model" value="p450_sslidar_camera"/>
 			<arg name="x" value="0.0"/>
 			<arg name="y" value="0.0"/>
 			<arg name="z" value="0.0"/>

@@ -39,8 +39,8 @@
 		<!-- depth topic: depth image, 640x480 by default -->
 		<!-- cloud topic: point cloud measurement  -->
 		<!-- subscribe ONLY TO ONE of the two topics -->
-		<arg name="depth_topic" value="/realsense_plugin/camera/depth/image_raw_"/>
-		<arg name="cloud_topic" value="$(arg uav_name)/sensors/sslidar_scan"/>
+		<arg name="depth_topic" value="/camera/depth/image_raw"/>
+		<arg name="cloud_topic" value="$(arg uav_name)/sensors/sslidar_scan_depre"/>
 
 		<!-- maximum velocity and acceleration the drone will reach -->
 		<arg name="max_vel" value="0.8" />
