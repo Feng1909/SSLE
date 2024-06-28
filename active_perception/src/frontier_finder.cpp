@@ -58,6 +58,7 @@ void FrontierFinder::searchFrontiers() {
 
   // Bounding box of updated region
   Vector3d update_min, update_max;
+  // 视野范围，也就是探索过的区域
   edt_env_->sdf_map_->getUpdatedBox(update_min, update_max, true);
 
   // Removed changed frontiers in updated map
@@ -70,11 +71,13 @@ void FrontierFinder::searchFrontiers() {
     iter = frontiers.erase(iter);
   };
 
-  //std::cout << "Before remove: " << frontiers_.size() << std::endl;
+  // std::cout << "Before remove: " << frontiers_.size() << std::endl;
 
   removed_ids_.clear();
   int rmv_idx = 0;
   for (auto iter = frontiers_.begin(); iter != frontiers_.end();) {
+    // 重叠指的是包含，是去除已经看见过的区域中的点
+    // 改变是指是否仍然是边界点(本身是已知的，上下左右前后六个相邻点有未知点)，如果不是边界点，就去除
     if (haveOverlap(iter->box_min_, iter->box_max_, update_min, update_max) &&
         isFrontierChanged(*iter)) {
       resetFlag(iter, frontiers_);
@@ -84,7 +87,8 @@ void FrontierFinder::searchFrontiers() {
       ++iter;
     }
   }
-  //std::cout << "After remove: " << frontiers_.size() << std::endl;
+  // std::cout << "After remove: " << frontiers_.size() << std::endl;
+  // dormant_frontiers_里是找不到Viewpoint的frontier
   for (auto iter = dormant_frontiers_.begin(); iter != dormant_frontiers_.end();) {
     if (haveOverlap(iter->box_min_, iter->box_max_, update_min, update_max) &&
         isFrontierChanged(*iter))
@@ -106,6 +110,7 @@ void FrontierFinder::searchFrontiers() {
   edt_env_->sdf_map_->posToIndex(search_min, min_id);
   edt_env_->sdf_map_->posToIndex(search_max, max_id);
 
+  // 寻找这块区域内的边界点，要求：1.不是边界点；2.是未占领点；3.周围有未知点
   for (int x = min_id(0); x <= max_id(0); ++x)
     for (int y = min_id(1); y <= max_id(1); ++y)
       for (int z = min_id(2); z <= max_id(2); ++z) {
@@ -113,6 +118,7 @@ void FrontierFinder::searchFrontiers() {
         Eigen::Vector3i cur(x, y, z);
         if (frontier_flag_[toadr(cur)] == 0 && knownfree(cur) && isNeighborUnknown(cur)) {
           // Expand from the seed cell to find a complete frontier cluster
+          // 广度优先搜索，作为聚类
           expandFrontier(cur);
         }
       }
@@ -159,6 +165,7 @@ void FrontierFinder::expandFrontier(
     // Compute detailed info
     Frontier frontier;
     frontier.cells_ = expanded;
+    // 计算聚类中心位置，下采样减少类的点
     computeFrontierInfo(frontier);
     tmp_frontiers_.push_back(frontier);
   }
@@ -197,9 +204,10 @@ bool FrontierFinder::splitHorizontally(const Frontier& frontier, list<Frontier>&
     Eigen::Vector2d diff = cell.head<2>() - mean;
     cov += diff * diff.transpose();
   }
+  // 协方差
   cov /= double(frontier.filtered_cells_.size());
 
-  // Find eigenvector corresponds to maximal eigenvector
+  // 找出对应于最大特征向量的特征向量
   Eigen::EigenSolver<Eigen::Matrix2d> es(cov);
   auto values = es.eigenvalues().real();
   auto vectors = es.eigenvectors().real();
@@ -211,6 +219,7 @@ bool FrontierFinder::splitHorizontally(const Frontier& frontier, list<Frontier>&
       max_eigenvalue = values[i];
     }
   }
+  // 主特征向量
   Eigen::Vector2d first_pc = vectors.col(max_idx);
   //std::cout << "max idx: " << max_idx << std::endl;
   //std::cout << "mean: " << mean.transpose() << ", first pc: " << first_pc.transpose() << std::endl;
@@ -387,6 +396,7 @@ void FrontierFinder::computeFrontierInfo(Frontier& ftr) {
   ftr.average_ /= double(ftr.cells_.size());
 
   // Compute downsampled cluster
+  // 下采样减少点的数量
   downsample(ftr.cells_, ftr.filtered_cells_);
 }
 
@@ -396,7 +406,7 @@ void FrontierFinder::computeFrontiersToVisit() {
   int new_dormant_num = 0;
   // Try find viewpoints for each cluster and categorize them according to viewpoint number
   for (auto& tmp_ftr : tmp_frontiers_) {
-    // Search viewpoints around frontier
+    // Search viewpoints around frontier，能看见点的数量大于min_visib_num_的视点才会被保留
     sampleViewpoints(tmp_ftr);
     if (!tmp_ftr.viewpoints_.empty()) {
       ++new_num;
@@ -744,8 +754,9 @@ int FrontierFinder::countVisibleCells(
     raycaster_->input(cell, pos);
     bool visib = true;
     while (raycaster_->nextId(idx)) {
-      if (edt_env_->sdf_map_->getInflateOccupancy(idx) == 1 ||
-          edt_env_->sdf_map_->getOccupancy(idx) == SDFMap::UNKNOWN) {
+      // if (edt_env_->sdf_map_->getInflateOccupancy(idx) == 1 ||
+      //     edt_env_->sdf_map_->getOccupancy(idx) == SDFMap::UNKNOWN) {
+      if (edt_env_->sdf_map_->getInflateOccupancy(idx) == 1) {
         visib = false;
         break;
       }

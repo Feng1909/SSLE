@@ -13,16 +13,19 @@
     <arg name="respawn_gazebo" default="false"/>
 	<arg name="use_sim_time" default="true"/>
 	<arg name="world" value="$(find sim_kit)/worlds/room_mini_clustered.world"/>
+	<arg name="run_sim" default="true"/>
     <!-- Gazebo sim -->
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-		<arg name="use_sim_time" value="$(arg use_sim_time)"/>
-        <arg name="gui" value="$(arg gui)"/>
-        <arg name="debug" value="$(arg debug)"/>
-        <arg name="verbose" value="$(arg verbose)"/>
-        <arg name="paused" value ="$(arg paused)"/>
-        <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
-        <arg name="world_name" value="$(arg world)"/>	
-    </include>
+	<group if="$(arg run_sim)">
+		<include file="$(find gazebo_ros)/launch/empty_world.launch">
+			<arg name="use_sim_time" value="$(arg use_sim_time)"/>
+			<arg name="gui" value="$(arg gui)"/>
+			<arg name="debug" value="$(arg debug)"/>
+			<arg name="verbose" value="$(arg verbose)"/>
+			<arg name="paused" value ="$(arg paused)"/>
+			<arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
+			<arg name="world_name" value="$(arg world)"/>	
+		</include>
+	</group>
 
 
 	<node name="rviz_visualisation" pkg="rviz" type="rviz" output="log" args="-d $(find exploration_manager)/config/multi_exp.rviz" />
@@ -33,29 +36,33 @@
 <!-- UAV1 -->
 	<group ns="$(arg uav1_name)">
 
-		<include file="$(find sim_kit)/launch/include/single_basic.launch">
-			<arg name="uav_name" value="$(arg uav1_name)"/>
-			<arg name="ID" value="0"/>
-			<arg name="model" value="p450_sslidar_camera"/>
-			<arg name="x" value="0.0"/>
-			<arg name="y" value="0.0"/>
-			<arg name="z" value="0.0"/>
-			<arg name="R" value="0.0"/>
-			<arg name="P" value="0.0"/>
-			<arg name="Y" value="0.0"/>
-		</include>
+		<group if="$(arg run_sim)">
+			<include file="$(find sim_kit)/launch/include/single_basic.launch">
+				<arg name="uav_name" value="$(arg uav1_name)"/>
+				<arg name="ID" value="0"/>
+				<arg name="model" value="p450_sslidar_camera"/>
+				<arg name="x" value="0.0"/>
+				<arg name="y" value="0.0"/>
+				<arg name="z" value="0.0"/>
+				<arg name="R" value="0.0"/>
+				<arg name="P" value="0.0"/>
+				<arg name="Y" value="0.0"/>
+			</include>
+		</group>
 
 		<include file="$(find sim_kit)/launch/include/single_exp_sim_sslidar.launch">
 			<arg name="uav_name" value="$(arg uav1_name)"/>
 		</include>
 
-		<node name="pub_cmd_uav" pkg="msg_conversion" type="pub_px4_cmd" output="screen" launch-prefix="gnome-terminal --tab --">
-			<param name="uav_name" value="$(arg uav1_name)"/>
-		</node>
+		<group if="$(arg run_sim)">
+			<node name="pub_cmd_uav" pkg="msg_conversion" type="pub_px4_cmd" output="screen" launch-prefix="gnome-terminal --tab --">
+				<param name="uav_name" value="$(arg uav1_name)"/>
+			</node>
 
-		<node name="pub_sensor_pose" pkg="msg_conversion" type="pub_sensor_pose" output="screen"> 
-			<param name="uav_name" value="$(arg uav1_name)"/>
-		</node>
+			<node name="pub_sensor_pose" pkg="msg_conversion" type="pub_sensor_pose" output="screen"> 
+				<param name="uav_name" value="$(arg uav1_name)"/>
+			</node>
+		</group>
 	
 	</group>
 	

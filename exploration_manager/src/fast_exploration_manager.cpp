@@ -112,13 +112,14 @@ int FastExplorationManager::planExploreMotion(
     ROS_WARN("No coverable frontier.");
     return NO_FRONTIER;
   }
+  // 选择一定距离外最近的能看见最多的frontier
   frontier_finder_->getTopViewpointsInfo(pos, ed_->points_, ed_->yaws_, ed_->averages_);
   for (int i = 0; i < ed_->points_.size(); ++i)
     ed_->views_.push_back(
         ed_->points_[i] + 2.0 * Vector3d(cos(ed_->yaws_[i]), sin(ed_->yaws_[i]), 0));
 
   double view_time = (ros::Time::now() - t1).toSec();
-  ROS_WARN(
+  ROS_INFO(
       "Frontier: %d, t: %lf, viewpoint: %d, t: %lf", ed_->frontiers_.size(), frontier_time,
       ed_->points_.size(), view_time);
 
