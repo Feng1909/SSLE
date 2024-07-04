@@ -115,6 +115,7 @@ view_right = []
 FOV = 70/180*np.pi
 view_length = 100*np.tan(FOV/2)
 colors = [[0, 0, 255], [0, 255, 0], [255, 0, 0]]
+garbage_points = []
 for i in range(len(view_points)):
     if i == 0:
         yaw = np.arctan2(view_points[i+1][1]-view_points[i][1], view_points[i+1][0]-view_points[i][0])
@@ -133,17 +134,30 @@ for i in range(len(view_points)):
     img_tmp2 = np.zeros((1000, 1000), np.uint8)
     cv2.fillPoly(img_tmp1, [np.array([view_points[i], view_point_tmp1l, view_point_tmp1r])], 255)
     cv2.fillPoly(img_tmp2, [np.array([view_points[i], view_point_tmp2l, view_point_tmp2r])], 255)
-    if np.sum(img_tmp1 & known_img) < np.sum(img_tmp2 & known_img):
+    # if np.sum(img_tmp1 & known_img) < np.sum(img_tmp2 & known_img):
+    #     yaw += np.pi
+    # if np.sum
+    num1 = np.sum(img_tmp1 & known_img)
+    num2 = np.sum(img_tmp2 & known_img)
+    if num1 < num2:
         yaw += np.pi
     
     view_left.append([int(view_points[i][0]+view_length*np.cos(yaw+FOV/2)), int(view_points[i][1]+view_length*np.sin(yaw+FOV/2))])
     view_right.append([int(view_points[i][0]+view_length*np.cos(yaw-FOV/2)), int(view_points[i][1]+view_length*np.sin(yaw-FOV/2))])
+    # print(view_left[i])
+    if num1 == 0 and num2 == 0:
+        garbage_points.append(view_points[i])
+        continue
     cv2.line(vis, (view_points[i][0], view_points[i][1]), (view_left[i][0], view_left[i][1]), colors[i%3], 1)
     cv2.line(vis, (view_points[i][0], view_points[i][1]), (view_right[i][0], view_right[i][1]), colors[i%3], 1)
     # 填充颜色，透明
     vis_tmp = vis.copy()
     cv2.fillPoly(vis_tmp, [np.array([view_points[i], view_left[i], view_right[i]])], colors[i%3], )
     vis = cv2.addWeighted(vis, 0.5, vis_tmp, 0.5, 0)
+
+for i in garbage_points:
+    view_points.remove(i)
+    tsp_points.remove(i)
 
 # 起始点
 cv2.circle(vis, (700, 600), 5, (0, 0, 0), -1)
