@@ -53,6 +53,9 @@
 		<include file="$(find sim_kit)/launch/include/single_exp_sim_sslidar.launch">
 			<arg name="uav_name" value="$(arg uav1_name)"/>
 		</include>
+		
+		<node name="view_point_generator" pkg="gs_viewpoint_generator" type="gs_viewpoint.py" output="screen" >
+		</node>
 
 		<group if="$(arg run_sim)">
 			<node name="pub_cmd_uav" pkg="msg_conversion" type="pub_px4_cmd" output="screen" launch-prefix="gnome-terminal --tab --">

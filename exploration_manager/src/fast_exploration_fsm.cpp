@@ -8,6 +8,7 @@
 #include <plan_env/sdf_map.h>
 #include <std_msgs/Int8.h>
 
+
 using Eigen::Vector4d;
 quadrotor_msgs::PositionCommand cmd;
 
@@ -50,6 +51,7 @@ void FastExplorationFSM::init(ros::NodeHandle& nh) {
   trigger_sub_ =
       nh.subscribe("/move_base_simple/goal", 1, &FastExplorationFSM::triggerCallback, this);
   odom_sub_ = nh.subscribe("/odom_world", 1, &FastExplorationFSM::odometryCallback, this);
+  view_point_sub_ = nh.subscribe("/view_points", 1, &FastExplorationFSM::viewPointCallback, this);
 
   replan_pub_ = nh.advertise<std_msgs::Empty>("planning/replan", 10);
   new_pub_ = nh.advertise<std_msgs::Empty>("planning/new", 10);
@@ -472,6 +474,9 @@ void FastExplorationFSM::safetyCallback(const ros::TimerEvent& e) {
   }
 }
 
+void FastExplorationFSM::viewPointCallback(const gs_viewpoint_generator::view_points_msgConstPtr& msg){
+  fd_->view_points_ = *msg;
+}
 
 void FastExplorationFSM::odometryCallback(const nav_msgs::OdometryConstPtr& msg) {
   fd_->odom_pos_(0) = msg->pose.pose.position.x;

@@ -4,6 +4,7 @@
 #include <Eigen/Eigen>
 #include <vector>
 #include <bspline/Bspline.h>
+#include "gs_viewpoint_generator/view_points_msg.h"
 
 using std::vector;
 using Eigen::Vector3d;
@@ -21,6 +22,9 @@ struct FSMData {
   Eigen::Vector3d initial_position_, start_pt_, start_vel_, start_acc_, start_yaw_;  // start state
   vector<Eigen::Vector3d> start_poss;
   bspline::Bspline newest_traj_;
+
+  gs_viewpoint_generator::view_points_msg view_points_;
+
 };
 
 struct FSMParam {

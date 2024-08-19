@@ -17,6 +17,8 @@
 #include <string>
 #include <thread>
 
+#include "gs_viewpoint_generator/view_points_msg.h"
+
 using Eigen::Vector3d;
 using std::vector;
 using std::shared_ptr;
@@ -49,7 +51,7 @@ private:
   ros::NodeHandle node_;
   ros::Time finish_time_, unfinish_time_, plan_failed_time_;//calculate time stay in 
   ros::Timer exec_timer_, safety_timer_, vis_timer_, frontier_timer_;
-  ros::Subscriber trigger_sub_, odom_sub_;
+  ros::Subscriber trigger_sub_, odom_sub_, view_point_sub_;
   ros::Publisher replan_pub_, new_pub_, bspline_pub_, status_pub_;
 
   /* helper functions */
@@ -62,6 +64,7 @@ private:
   void frontierCallback(const ros::TimerEvent& e);
   void triggerCallback(const geometry_msgs::PoseStamped& msg);
   void odometryCallback(const nav_msgs::OdometryConstPtr& msg);
+  void viewPointCallback(const gs_viewpoint_generator::view_points_msgConstPtr& msg);
   void visualize();
   void clearVisMarker();
 

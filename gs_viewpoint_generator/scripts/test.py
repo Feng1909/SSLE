@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 from math import hypot
+import time
 
 # img是地图，exp是探测范围，vis是可视化
 # known_img是已知地图
@@ -51,6 +52,8 @@ cv2.imshow('地图', vis_img)
 # path_history = []
 # path_history.append([700, 600])
 
+begin_time = time.time()
+
 # 选取轮廓
 mask = (img == 255) & (exp == 255)
 known_img[mask] = 255
@@ -64,6 +67,8 @@ mask = (dilation == 255) & (exp == 255)
 # known_img[dilation == 255] = 255
 
 # 寻找轮廓
+# print(dilation)
+# sdf
 contours, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 # 绘制轮廓
 cv2.drawContours(line_tmp, contours, -1, 255, 3)
@@ -90,6 +95,7 @@ def get_list(point1, point2):
         x = x1 + dif_x / num * i
         y = y1 + dif_y / num * i
         points.append([int(x), int(y)])
+
 for contour in contours:
     for num in range(len(contour)):
         if contour[num][0][0] < 100 or contour[num][0][1] < 100:
@@ -108,6 +114,9 @@ for point in points:
         cv2.circle(vis, (point[0], point[1]), 5, (0, 0, 255), -1)
         tsp_points.append(point)
         view_points.append(point)
+
+points_time = time.time()
+print('points time:', points_time-begin_time)
 
 # 计算视场
 view_left = []
@@ -155,6 +164,9 @@ for i in range(len(view_points)):
     cv2.fillPoly(vis_tmp, [np.array([view_points[i], view_left[i], view_right[i]])], colors[i%3], )
     vis = cv2.addWeighted(vis, 0.5, vis_tmp, 0.5, 0)
 
+view_time = time.time()
+print('view time:', view_time-points_time)
+
 for i in garbage_points:
     view_points.remove(i)
     tsp_points.remove(i)
@@ -163,23 +175,26 @@ for i in garbage_points:
 cv2.circle(vis, (700, 600), 5, (0, 0, 0), -1)
 tsp_points.append([700, 600])
 
-def frontier(i, j):
-    for point in tsp_points:
-        if hypot(i-point[1], j-point[0]) < 40:
-            return False
-    if exp[i-1, j] == 0:
-        return True
-    if exp[i+1, j] == 0:
-        return True
-    if exp[i, j-1] == 0:
-        return True
-    if exp[i, j+1] == 0:
-        return True
-for i in range(img.shape[0]):
-    for j in range(img.shape[1]):
-        if exp[i, j] == 255 and img[i, j] == 0 and frontier(i, j):
-            cv2.circle(vis, (i, j), 7, (255, 255, 0), -1)
-            # tsp_points.append([i, j])
+# def frontier(i, j):
+#     for point in tsp_points:
+#         if hypot(i-point[1], j-point[0]) < 40:
+#             return False
+#     if exp[i-1, j] == 0:
+#         return True
+#     if exp[i+1, j] == 0:
+#         return True
+#     if exp[i, j-1] == 0:
+#         return True
+#     if exp[i, j+1] == 0:
+#         return True
+# for i in range(img.shape[0]):
+#     for j in range(img.shape[1]):
+#         if exp[i, j] == 255 and img[i, j] == 0 and frontier(i, j):
+#             cv2.circle(vis, (i, j), 7, (255, 255, 0), -1)
+#             # tsp_points.append([i, j])
+
+frontier_time = time.time()
+# print('frontier time:', frontier_time-view_time)
 
 import os
 import shutil
@@ -315,6 +330,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+tsp_time = time.time()
+print('tsp time:', tsp_time-frontier_time)
 
 with open('TSPLIB/city031.txt', 'r') as f:
     lines = f.readlines()
