@@ -8,6 +8,8 @@
 #include <list>
 #include <utility>
 
+#include "gs_viewpoint_generator/view_points_msg.h"
+
 using Eigen::Vector3d;
 using std::shared_ptr;
 using std::unique_ptr;
@@ -56,7 +58,7 @@ public:
   ~FrontierFinder();
 
   void searchFrontiers();
-  void computeFrontiersToVisit();
+  void computeFrontiersToVisit(const gs_viewpoint_generator::view_points_msg& view_points);
 
   void getFrontiers(vector<vector<Vector3d>>& clusters);
   void getDormantFrontiers(vector<vector<Vector3d>>& clusters);

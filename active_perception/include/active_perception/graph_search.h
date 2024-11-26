@@ -75,17 +75,21 @@ void GraphSearch<NodeT>::addEdge(const int& from, const int& to) {
 template <typename NodeT>
 void GraphSearch<NodeT>::DijkstraSearch(const int& start, const int& goal,
                                         vector<shared_ptr<NodeT>>& path) {
-  //std::cout << "Node: " << node_num_ << ", edge: " << edge_num_ << std::endl;
+  // std::cout<<"hahaha\n";
+  // std::cout << "Node: " << node_num_ << ", edge: " << edge_num_ << std::endl;
   // Basic structure used by Dijkstra
   // unordered_map<int, int> close_set;
+  // std::cout<<"1\n";
   priority_queue<shared_ptr<NodeT>, vector<shared_ptr<NodeT>>, NodeCompare<NodeT>> open_set;
 
   shared_ptr<NodeT> start_v = nodes_[start];
   shared_ptr<NodeT> end_v = nodes_[goal];
   start_v->g_value_ = 0.0;
   open_set.push(start_v);
+  // std::cout<<"2\n";
 
   while (!open_set.empty()) {
+  // std::cout<<"3\n";
     auto vc = open_set.top();
     open_set.pop();
     vc->closed_ = true;
@@ -93,7 +97,7 @@ void GraphSearch<NodeT>::DijkstraSearch(const int& start, const int& goal,
 
     // Check if reach target
     if (vc == end_v) {
-      // //std::cout << "Dijkstra reach target" << std::endl;
+      //std::cout << "Dijkstra reach target" << std::endl;
       shared_ptr<NodeT> vit = vc;
       while (vit != nullptr) {
         path.push_back(vit);
@@ -102,8 +106,10 @@ void GraphSearch<NodeT>::DijkstraSearch(const int& start, const int& goal,
       reverse(path.begin(), path.end());
       return;
     }
+    // std::cout<<"neighbor: "<<vc->neighbors_.size()<<"\n";
     for (auto vb : vc->neighbors_) {
       // Check if in close set
+  // std::cout<<"4\n";
       if (vb->closed_) continue;
 
       // Add new node or updated node in open set

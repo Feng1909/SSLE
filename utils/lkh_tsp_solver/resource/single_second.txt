@@ -1,0 +1,22 @@
+NAME : single_second.998.tour
+COMMENT : Length = 998
+COMMENT : Found by LKH [Keld Helsgaun] Tue Nov 26 09:36:17 2024
+TYPE : TOUR
+DIMENSION : 14
+TOUR_SECTION
+1
+9
+8
+7
+6
+5
+13
+4
+3
+14
+12
+11
+2
+10
+-1
+EOF

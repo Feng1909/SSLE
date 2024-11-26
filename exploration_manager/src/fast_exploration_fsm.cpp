@@ -51,7 +51,7 @@ void FastExplorationFSM::init(ros::NodeHandle& nh) {
   trigger_sub_ =
       nh.subscribe("/move_base_simple/goal", 1, &FastExplorationFSM::triggerCallback, this);
   odom_sub_ = nh.subscribe("/odom_world", 1, &FastExplorationFSM::odometryCallback, this);
-  view_point_sub_ = nh.subscribe("/view_points", 1, &FastExplorationFSM::viewPointCallback, this);
+  view_point_sub_ = nh.subscribe("view_points", 1, &FastExplorationFSM::viewPointCallback, this);
 
   replan_pub_ = nh.advertise<std_msgs::Empty>("planning/replan", 10);
   new_pub_ = nh.advertise<std_msgs::Empty>("planning/new", 10);
@@ -268,7 +268,7 @@ int FastExplorationFSM::callExplorationPlanner() {
     res = expl_manager_->planReturnMotion(fd_->start_pt_, fd_->start_vel_, fd_->start_acc_, fd_->start_yaw_, fd_->initial_position_);
   }
   else{
-    res = expl_manager_->planExploreMotion(fd_->start_pt_, fd_->start_vel_, fd_->start_acc_, fd_->start_yaw_);
+    res = expl_manager_->planExploreMotion(fd_->start_pt_, fd_->start_vel_, fd_->start_acc_, fd_->start_yaw_, fd_->view_points_);
   }
   classic_ = false;
 
@@ -395,7 +395,7 @@ void FastExplorationFSM::frontierCallback(const ros::TimerEvent& e) {
     auto ft = expl_manager_->frontier_finder_;
     auto ed = expl_manager_->ed_;
     ft->searchFrontiers();
-    ft->computeFrontiersToVisit();
+    ft->computeFrontiersToVisit(fd_->view_points_);
     ft->updateFrontierCostMatrix();
 
     ft->getFrontiers(ed->frontiers_);

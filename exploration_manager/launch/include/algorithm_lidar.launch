@@ -101,7 +101,7 @@
     <param name="exploration/relax_time" value="1.0" type="double"/>
 
     <!-- Frontier Generation -->
-    <param name="frontier/cluster_min" value="3" type="int"/>
+    <param name="frontier/cluster_min" value="1" type="int"/>
     <param name="frontier/cluster_size_xy" value="1.0" type="double"/>
     <param name="frontier/cluster_size_z" value="10.0" type="double"/>
     <param name="frontier/min_candidate_dist" value="0.75" type="double"/>
@@ -119,8 +119,8 @@
     <param name="perception_utils/top_angle" value="0.56125" type="double"/>
     <param name="perception_utils/left_angle" value="0.69222" type="double"/>
     <param name="perception_utils/right_angle" value="0.68901" type="double"/>
-    <param name="perception_utils/max_dist" value="10" type="double"/>
-    <param name="perception_utils/vis_dist" value="10.0" type="double"/>
+    <param name="perception_utils/max_dist" value="4.5" type="double"/>
+    <param name="perception_utils/vis_dist" value="1.0" type="double"/>
 
 
     <param name="heading_planner/yaw_diff" value="$(eval 30 * 3.1415926 / 180.0)" type="double"/>

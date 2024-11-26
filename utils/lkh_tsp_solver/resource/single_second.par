@@ -1,0 +1,4 @@
+PROBLEM_FILE = /home/yugrp01/catkin_ws/src/SSLE/utils/lkh_tsp_solver/resource/single_second.tsp
+GAIN23 = NO
+OUTPUT_TOUR_FILE =/home/yugrp01/catkin_ws/src/SSLE/utils/lkh_tsp_solver/resource/single_second.txt
+RUNS = 1

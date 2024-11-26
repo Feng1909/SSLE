@@ -1664,10 +1664,10 @@
         </link>
       </model>
       <model name='bookshelf_2_clone_0'>
-        <pose frame=''>0.352676 3.72757 0 0 -0 1.51891</pose>
+        <pose frame=''>0.0 3.72757 0 0 -0 1.51891</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0.352676 3.72757 0 0 -0 1.51891</pose>
+          <pose frame=''>0.0 3.72757 0 0 -0 1.51891</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -2276,7 +2276,7 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <pose frame=''>0.352676 3.72757 0 0 -0 1.51891</pose>
+      <pose frame=''>0.0 3.72757 0 0 -0 1.51891</pose>
     </model>
   </world>
 </sdf>

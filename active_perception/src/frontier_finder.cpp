@@ -400,7 +400,7 @@ void FrontierFinder::computeFrontierInfo(Frontier& ftr) {
   downsample(ftr.cells_, ftr.filtered_cells_);
 }
 
-void FrontierFinder::computeFrontiersToVisit() {
+void FrontierFinder::computeFrontiersToVisit(const gs_viewpoint_generator::view_points_msg& view_points) {
   first_new_ftr_ = frontiers_.end();
   int new_num = 0;
   int new_dormant_num = 0;
@@ -423,6 +423,35 @@ void FrontierFinder::computeFrontiersToVisit() {
     }
   }
   // Reset indices of frontiers
+
+  // view point in planner
+  // int number_1 = frontiers_.size();
+  // for (auto& view_point: view_points.view_points) {
+  //   bool flag = true;
+  //   for (auto& ft: frontiers_) {
+  //     if (std::hypot(view_point.pose.position.x - ft.average_[0], view_point.pose.position.y - ft.average_[1]) < 0.2) {
+  //       flag = false;
+  //       break;
+  //     }
+  //   }
+  //   if (flag) {
+  //     Frontier frontier_tmp;
+  //     Viewpoint viewpoint_tmp;
+  //     frontier_tmp.average_ = Vector3d(view_point.pose.position.x, view_point.pose.position.y, view_point.pose.position.z);
+  //     frontier_tmp.cells_.push_back(frontier_tmp.average_);
+  //     viewpoint_tmp.pos_ = frontier_tmp.average_;
+  //     viewpoint_tmp.yaw_ = view_point.pose.orientation.z;
+  //     // viewpoint_tmp.visib_num_ = 100;
+  //     frontier_tmp.viewpoints_.push_back(viewpoint_tmp);
+  //     // frontiers_.push_back(frontier_tmp);
+  //     // ++new_num;
+  //     // list<Frontier>::iterator inserted = frontiers_.insert(frontiers_.end(), frontier_tmp);
+  //     // if (first_new_ftr_ == frontiers_.end()) first_new_ftr_ = inserted;
+  //   }
+  // }
+  // std::cout<<view_points.view_points.size()<<std::endl;
+  // std::cout<<"additional frontiers: "<<frontiers_.size() - number_1<<std::endl;
+
   int idx = 0;
   for (auto& ft : frontiers_) {
     ft.id_ = idx++;
@@ -447,6 +476,8 @@ void FrontierFinder::getTopViewpointsInfo(
       points.push_back(view.pos_);
       yaws.push_back(view.yaw_);
       averages.push_back(frontier.average_);
+      // std::cout<<view.pos_<<std::endl;
+      // std::cout<<frontier.average_<<std::endl;
       no_view = false;
       break;
     }

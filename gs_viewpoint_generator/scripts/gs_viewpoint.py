@@ -19,7 +19,7 @@ class ViewpointGenerator:
         self.exp = np.zeros([int(self.map_width/self.resolution), int(self.map_height/self.resolution)])
         self.known_img = np.zeros([int(self.map_width/self.resolution), int(self.map_height/self.resolution)], np.uint8)
 
-        self.safe_dis = 1.0
+        self.safe_dis = 1.3
 
         self.pose = PoseStamped().pose
 
@@ -125,7 +125,7 @@ class ViewpointGenerator:
         view_left = []
         view_right = []
         FOV = 70/180*np.pi
-        view_length = 1.0*np.tan(FOV/2)/self.resolution
+        view_length = self.safe_dis*np.tan(FOV/2)/self.resolution
         colors = [[0, 0, 225], [0, 225, 0], [255, 0, 0]]
         garbage_points = []
         for i in range(len(view_points)):
@@ -163,20 +163,24 @@ class ViewpointGenerator:
             view_left = [int(view_points[i][0]+view_length*np.cos(yaw+FOV/2)), int(view_points[i][1]+view_length*np.sin(yaw+FOV/2))]
             view_right = [int(view_points[i][0]+view_length*np.cos(yaw-FOV/2)), int(view_points[i][1]+view_length*np.sin(yaw-FOV/2))]
             vis_tmp = vis.copy()
-            cv2.fillPoly(vis_tmp, [np.array([view_points[i], view_left, view_right])], colors[i%3])
-            vis = cv2.addWeighted(vis, 0.5, vis_tmp, 0.5, 0)
+            # cv2.fillPoly(vis_tmp, [np.array([view_points[i], view_left, view_right])], colors[i%3])
+            # vis = cv2.addWeighted(vis, 0.5, vis_tmp, 0.5, 0)
 
             valid = True
             for point in self.traj_history:
-                if hypot(point.pose.position.x - view_points[i][0]*self.resolution, point.pose.position.y - view_points[i][1]*self.resolution) < 0.2:
+                if hypot(point.pose.position.y - view_points[i][0]*self.resolution + self.map_width/2, point.pose.position.x - view_points[i][1]*self.resolution + self.map_height/2) < self.safe_dis/2:
                     valid = False
                     break
             if valid:
                 point_tmp = PoseStamped()
-                point_tmp.pose.position.x = view_points[i][0]*self.resolution
-                point_tmp.pose.position.y = view_points[i][1]*self.resolution
-                point_tmp.pose.orientation.z = yaw
+                point_tmp.pose.position.y = view_points[i][0]*self.resolution - self.map_width/2
+                point_tmp.pose.position.x = view_points[i][1]*self.resolution - self.map_height/2
+                point_tmp.pose.orientation.z = yaw + np.pi/2
                 self.view_points_msg.view_points.append(point_tmp)
+                cv2.fillPoly(vis_tmp, [np.array([view_points[i], view_left, view_right])], colors[i%3])
+                # 写坐标
+                # cv2.putText(vis_tmp, str([point_tmp.pose.position.x, point_tmp.pose.position.y]), (view_points[i][0], view_points[i][1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+                vis = cv2.addWeighted(vis, 0.5, vis_tmp, 0.5, 0)
         
         self.view_points_pub.publish(self.view_points_msg)
 

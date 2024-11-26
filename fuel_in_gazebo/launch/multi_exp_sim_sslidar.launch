@@ -6,13 +6,14 @@
 
 	<!-- 启动Gazebo -->
 	<!-- Gazebo configs -->
-    <arg name="gui" default="true"/>
+    <arg name="gui" default="false"/>
     <arg name="debug" default="false"/>
     <arg name="verbose" default="false"/>
     <arg name="paused" default="false"/>
     <arg name="respawn_gazebo" default="false"/>
 	<arg name="use_sim_time" default="true"/>
-	<arg name="world" value="$(find sim_kit)/worlds/room_mini_clustered.world"/>
+	<!-- <arg name="world" value="$(find sim_kit)/worlds/room_mini_clustered.world"/> -->
+	<arg name="world" value="$(find sim_kit)/worlds/room_mini_with_roof.world"/>
 	<arg name="run_sim" default="true"/>
     <!-- Gazebo sim -->
 	<group if="$(arg run_sim)">
